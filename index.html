@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>じゃんけんクーポン</title>
+  <style>
+    body { font-family: sans-serif; text-align: center; padding: 2em; }
+    .hands img { width: 100px; margin: 10px; cursor: pointer; }
+    #result { margin-top: 20px; font-size: 1.5em; }
+    #coupon { margin-top: 10px; color: green; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <h1>じゃんけんしてクーポンをゲット！</h1>
+  <div class="hands">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/5/55/Fist.svg" alt="ぐー" onclick="play('ぐー')">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/4/4f/Scissors_icon.svg" alt="ちょき" onclick="play('ちょき')">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/e/e0/Open_hand.svg" alt="ぱー" onclick="play('ぱー')">
+  </div>
+  <div id="result"></div>
+  <div id="coupon"></div>
+
+  <script>
+    const hands = ["ぐー", "ちょき", "ぱー"];
+    const winMap = {
+      "ぐー": "ちょき",
+      "ちょき": "ぱー",
+      "ぱー": "ぐー"
+    };
+
+    function play(user) {
+      const computer = hands[Math.floor(Math.random() * hands.length)];
+      let resultText = `あなた：${user} ／ 相手：${computer}<br>`;
+      if (user === computer) {
+        resultText += "あいこです。もう一度！";
+        document.getElementById("coupon").innerText = "";
+      } else if (winMap[user] === computer) {
+        resultText += "あなたの勝ち！";
+        document.getElementById("coupon").innerText = "🎉 クーポンコード：ABC123 🎉";
+      } else {
+        resultText += "あなたの負け…もう一度挑戦！";
+        document.getElementById("coupon").innerText = "";
+      }
+      document.getElementById("result").innerHTML = resultText;
+    }
+  </script>
+</body>
+</html>
