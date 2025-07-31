@@ -1,82 +1,138 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>じゃんけんクーポン</title>
   <style>
     body {
-      font-family: sans-serif;
+      font-family: 'Arial', sans-serif;
       text-align: center;
-      margin-top: 50px;
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(to right, #ffecd2, #fcb69f);
     }
-    button {
-      font-size: 20px;
-      margin: 10px;
-      padding: 10px 30px;
+
+    h1 {
+      margin: 1rem 0;
+      font-size: 2rem;
+      color: #333;
     }
+
+    .hand-buttons {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin: 1rem;
+    }
+
+    .hand-buttons button {
+      background: none;
+      border: none;
+      cursor: pointer;
+      transition: transform 0.3s ease;
+    }
+
+    .hand-buttons button:hover {
+      transform: scale(1.1);
+    }
+
+    .hand-buttons img {
+      width: 100px;
+      height: 100px;
+    }
+
     #result {
-      font-size: 24px;
-      margin-top: 20px;
+      font-size: 1.2rem;
+      margin: 1rem;
+      padding: 1rem;
+      background-color: #fff3cd;
+      border: 2px dashed #f0ad4e;
+      display: inline-block;
+      animation: fadeIn 0.5s ease-in;
     }
+
     #coupon {
       display: none;
-      margin-top: 20px;
-      font-size: 20px;
-      color: green;
+      margin-top: 1rem;
+      font-size: 1.5rem;
+      color: #fff;
+      background: #28a745;
+      padding: 1rem;
+      border-radius: 10px;
+      position: relative;
+      animation: flash 1s infinite;
     }
+
     #copyBtn {
-      display: none;
-      margin-top: 10px;
-      padding: 8px 16px;
-      font-size: 16px;
+      margin-top: 0.5rem;
+      padding: 0.5rem 1rem;
+      font-size: 1rem;
+      background: #333;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.8); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    @keyframes flash {
+      0%, 100% { background-color: #28a745; }
+      50% { background-color: #218838; }
+    }
+
+    @media (max-width: 600px) {
+      .hand-buttons img {
+        width: 80px;
+        height: 80px;
+      }
+      h1 {
+        font-size: 1.5rem;
+      }
     }
   </style>
 </head>
 <body>
-  <h1>じゃんけんで勝ったらクーポンGET！</h1>
-  <div>
-    <button onclick="play('グー')">グー</button>
-    <button onclick="play('チョキ')">チョキ</button>
-    <button onclick="play('パー')">パー</button>
+  <h1>じゃんけんでクーポンをゲット！</h1>
+  <div class="hand-buttons">
+    <button onclick="play('グー')"><img src="img/gu.png" alt="グー" /></button>
+    <button onclick="play('チョキ')"><img src="img/choki.png" alt="チョキ" /></button>
+    <button onclick="play('パー')"><img src="img/pa.png" alt="パー" /></button>
   </div>
   <div id="result"></div>
-  <div id="coupon"></div>
-  <button id="copyBtn" onclick="copyCoupon()">クーポンコードをコピー</button>
+  <div id="coupon">🎉クーポンコード：<span id="couponCode">JKN2025</span></div>
+  <button id="copyBtn" onclick="copyCoupon()">コピー</button>
 
   <script>
-    const hands = ['グー', 'チョキ', 'パー'];
-    const couponCode = 'ABC123XYZ';
+    let played = false;
 
-    function play(userHand) {
-      const computerHand = hands[Math.floor(Math.random() * hands.length)];
-      let resultText = `あなた: ${userHand} / 相手: ${computerHand} → `;
+    function play(user) {
+      if (played) return;
+      played = true;
 
-      if (userHand === computerHand) {
-        resultText += 'あいこ！';
-        document.getElementById('coupon').style.display = 'none';
-        document.getElementById('copyBtn').style.display = 'none';
-      } else if (
-        (userHand === 'グー' && computerHand === 'チョキ') ||
-        (userHand === 'チョキ' && computerHand === 'パー') ||
-        (userHand === 'パー' && computerHand === 'グー')
-      ) {
-        resultText += '勝ち！🎉';
-        document.getElementById('coupon').textContent = `クーポンコード: ${couponCode}`;
-        document.getElementById('coupon').style.display = 'block';
-        document.getElementById('copyBtn').style.display = 'inline-block';
-      } else {
-        resultText += '負け…';
-        document.getElementById('coupon').style.display = 'none';
-        document.getElementById('copyBtn').style.display = 'none';
-      }
+      const hands = ["グー", "チョキ", "パー"];
+      let computer;
 
-      document.getElementById('result').textContent = resultText;
+      if (user === "グー") computer = "チョキ";
+      else if (user === "チョキ") computer = "パー";
+      else computer = "グー";
+
+      let resultText = `あなた：${user} ／ 相手：${computer}<br><strong>🎉あなたの勝ちです！</strong>`;
+      document.getElementById("result").innerHTML = resultText;
+
+      document.getElementById("coupon").style.display = "block";
+      document.getElementById("copyBtn").style.display = "inline-block";
     }
 
     function copyCoupon() {
-      const code = couponCode;
+      const code = document.getElementById("couponCode").innerText;
       navigator.clipboard.writeText(code).then(() => {
-        alert('クーポンコードをコピーしました！');
+        alert("クーポンコードをコピーしました！");
       });
     }
   </script>
