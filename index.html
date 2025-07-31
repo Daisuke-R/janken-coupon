@@ -1,152 +1,138 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
   <title>じゃんけんクーポン</title>
   <style>
     body {
+      font-family: 'Segoe UI', sans-serif;
+      text-align: center;
+      background-color: #111;
+      color: white;
       margin: 0;
       padding: 0;
-      font-family: 'Arial', sans-serif;
-      background: radial-gradient(circle, #ffecb3, #ff9800);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      text-align: center;
     }
 
     h1 {
-      font-size: 1.8rem;
-      color: #fff;
-      margin-bottom: 1rem;
-      animation: pulse 2s infinite;
+      font-size: 3em;
+      margin-top: 30px;
     }
 
-    @keyframes pulse {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.05); }
+    .hand-buttons {
+      margin: 30px;
     }
 
-    .hands {
-      display: flex;
-      justify-content: center;
-      gap: 1rem;
-      margin-bottom: 1rem;
-    }
-
-    .hand {
-      width: 80px;
-      height: 80px;
-      border-radius: 50%;
-      background: #fff;
-      padding: 10px;
+    .hand-button {
+      background-color: transparent;
+      border: none;
+      margin: 10px;
       cursor: pointer;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-      transition: transform 0.2s ease;
+      transition: transform 0.2s;
     }
 
-    .hand:hover {
+    .hand-button:hover {
       transform: scale(1.1);
     }
 
-    .hand img {
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
+    .hand-button img {
+      width: 120px;
+      height: 120px;
     }
 
-    #result {
-      font-size: 1.2rem;
-      color: #fff;
-      margin-top: 1rem;
+    .result {
+      font-size: 2em;
+      margin-top: 20px;
+      padding: 20px;
+      transition: all 0.5s;
     }
 
-    #couponArea {
-      margin-top: 1.5rem;
-      display: none;
-    }
-
-    #couponCode {
-      background: #fff;
+    .result.win {
+      background: linear-gradient(45deg, #ff0057, #ffbb00);
       color: #000;
-      font-size: 1.5rem;
-      padding: 0.5rem 1rem;
-      border-radius: 8px;
-      margin-bottom: 0.5rem;
-      display: inline-block;
+      font-size: 3em;
+      font-weight: bold;
+      border-radius: 10px;
+      box-shadow: 0 0 20px rgba(255, 0, 87, 0.8);
     }
 
-    #copyBtn {
-      background: #4CAF50;
+    .result.lose {
+      background: #333;
+      color: #ccc;
+    }
+
+    .result.draw {
+      background: #666;
       color: white;
-      border: none;
-      padding: 0.5rem 1rem;
-      border-radius: 5px;
-      cursor: pointer;
     }
 
-    #copyBtn:hover {
-      background: #45a049;
+    .computer-hand {
+      margin-top: 20px;
+      font-size: 1.2em;
     }
 
-    @media (max-width: 600px) {
-      h1 {
-        font-size: 1.4rem;
-      }
-      .hand {
-        width: 60px;
-        height: 60px;
-      }
+    .coupon {
+      display: none;
+      font-size: 2em;
+      margin-top: 20px;
+      background: #00ff99;
+      color: #000;
+      padding: 15px;
+      border-radius: 10px;
+      font-weight: bold;
     }
   </style>
 </head>
 <body>
-  <h1>じゃんけんでクーポンをゲット！</h1>
-  <div class="hands">
-    <div class="hand" data-user="グー"><img src="gu.png" alt="グー" /></div>
-    <div class="hand" data-user="チョキ"><img src="choki.png" alt="チョキ" /></div>
-    <div class="hand" data-user="パー"><img src="pa.png" alt="パー" /></div>
+  <h1>じゃんけんクーポン</h1>
+  <div class="hand-buttons">
+    <button class="hand-button" onclick="play('gu')">
+      <img src="gu.png" alt="グー">
+    </button>
+    <button class="hand-button" onclick="play('choki')">
+      <img src="choki.png" alt="チョキ">
+    </button>
+    <button class="hand-button" onclick="play('pa')">
+      <img src="pa.png" alt="パー">
+    </button>
   </div>
-  <div id="result"></div>
-  <div id="couponArea">
-    <div id="couponCode">COUPON12345</div>
-    <button id="copyBtn">コピー</button>
-  </div>
+
+  <div class="computer-hand" id="computerHand"></div>
+  <div class="result" id="resultText"></div>
+  <div class="coupon" id="couponText">🎁 おめでとう！クーポンGET！</div>
 
   <script>
-    const hands = document.querySelectorAll('.hand');
-    let alreadyPlayed = false;
+    const hands = ['gu', 'choki', 'pa'];
+    const handNames = { gu: 'グー', choki: 'チョキ', pa: 'パー' };
 
-    const winAgainst = {
-      'グー': 'チョキ',
-      'チョキ': 'パー',
-      'パー': 'グー'
-    };
+    function play(playerHand) {
+      const computerHand = hands[Math.floor(Math.random() * hands.length)];
+      document.getElementById('computerHand').textContent = `相手の手：${handNames[computerHand]}`;
 
-    hands.forEach(hand => {
-      hand.addEventListener('click', () => {
-        if (alreadyPlayed) return;
+      let result = '';
+      let resultText = document.getElementById('resultText');
+      let coupon = document.getElementById('couponText');
 
-        const user = hand.dataset.user;
-        const computer = winAgainst[user]; // 常にユーザー勝ち
-        const resultDiv = document.getElementById('result');
+      resultText.className = 'result';
+      coupon.style.display = 'none';
 
-        resultDiv.innerHTML = `<strong>あなた：</strong>${user}　／　<strong>相手：</strong>${computer}<br><span style="font-size:1.5rem;color:#FFD700;">🎉 あなたの勝ち！ 🎉</span>`;
+      if (playerHand === computerHand) {
+        result = 'あいこ';
+        resultText.classList.add('draw');
+      } else if (
+        (playerHand === 'gu' && computerHand === 'choki') ||
+        (playerHand === 'choki' && computerHand === 'pa') ||
+        (playerHand === 'pa' && computerHand === 'gu')
+      ) {
+        result = '勝ち！';
+        resultText.classList.add('win');
+        coupon.style.display = 'block';
+      } else {
+        result = '負け';
+        resultText.classList.add('lose');
+      }
 
-        document.getElementById('couponArea').style.display = 'block';
-        alreadyPlayed = true;
-      });
-    });
-
-    document.getElementById('copyBtn').addEventListener('click', () => {
-      const text = document.getElementById('couponCode').innerText;
-      navigator.clipboard.writeText(text).then(() => {
-        alert('クーポンコードをコピーしました！');
-      });
-    });
+      resultText.textContent = result;
+    }
   </script>
 </body>
 </html>
