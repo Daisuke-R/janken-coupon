@@ -5,14 +5,63 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>じゃんけんクーポン</title>
   <style>
-    body { font-family: sans-serif; text-align: center; padding: 2em; }
-    .hands img { width: 100px; margin: 10px; cursor: pointer; }
-    #result { margin-top: 20px; font-size: 1.5em; }
-    #coupon { margin-top: 10px; color: green; font-weight: bold; }
+    body {
+      font-family: "Segoe UI", "Helvetica Neue", sans-serif;
+      background: linear-gradient(to right, #1f1c2c, #928dab);
+      color: #fff;
+      text-align: center;
+      margin: 0;
+      padding: 1em;
+      height: 100vh;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    h1 {
+      font-size: 1.2em;
+      margin: 0.5em 0;
+      text-shadow: 1px 1px #000;
+    }
+    .hands {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin: 0.5em 0;
+    }
+    .hands img {
+      width: 70px;
+      cursor: pointer;
+      transition: transform 0.3s, filter 0.3s;
+    }
+    .hands img:hover {
+      transform: scale(1.1);
+      filter: drop-shadow(0 0 5px #fff);
+    }
+    .hands img.disabled {
+      opacity: 0.3;
+      cursor: default;
+      pointer-events: none;
+    }
+    #result {
+      font-size: 0.9em;
+      line-height: 1.4em;
+      margin: 0.5em 0;
+    }
+    #coupon {
+      font-size: 1.1em;
+      color: #00ff99;
+      font-weight: bold;
+      animation: glow 1s infinite alternate;
+    }
+    @keyframes glow {
+      from { text-shadow: 0 0 3px #0f0, 0 0 6px #0f0; }
+      to { text-shadow: 0 0 10px #0f0, 0 0 15px #0f0; }
+    }
   </style>
 </head>
 <body>
-  <h1>じゃんけんしてクーポンをゲット！</h1>
+  <h1>🔥 じゃんけんでクーポンゲット！ 🔥</h1>
   <div class="hands">
     <img src="gu.png" alt="ぐー" onclick="play('ぐー')">
     <img src="choki.png" alt="ちょき" onclick="play('ちょき')">
@@ -21,28 +70,33 @@
   <div id="result"></div>
   <div id="coupon"></div>
 
-<script>
-  const winMap = {
-    "ぐー": "ちょき",
-    "ちょき": "ぱー",
-    "ぱー": "ぐー"
-  };
+  <script>
+    const winMap = {
+      "ぐー": "ちょき",
+      "ちょき": "ぱー",
+      "ぱー": "ぐー"
+    };
 
-  let hasPlayed = false; // ← ここで1回限りのフラグを管理
+    let hasPlayed = false;
 
-  function play(user) {
-    if (hasPlayed) return; // すでにプレイしていたら無反応
-    hasPlayed = true;      // フラグを立てて、以降クリック無効化
+    function play(user) {
+      if (hasPlayed) return;
+      hasPlayed = true;
 
-    const computer = winMap[user];
+      const computer = winMap[user];
 
-    let resultText = `
-   🧍‍♂️ <strong>あなたの手：</strong>${user}<br>
-   🤖 <strong>相手の手：</strong>${computer}<br><br>
-   🎉 <strong style="color: green;">勝ちました！おめでとう！</strong> 🎉`;
-    document.getElementById("result").innerHTML = resultText;
-    document.getElementById("coupon").innerText = "🎉 クーポンコード：ABC123 🎉";
-  }
-</script>
+      let resultText = `
+        🧍‍♂️ <strong>あなた：</strong>${user}<br>
+        🤖 <strong>相手：</strong>${computer}<br><br>
+        <strong style="color: #00ff99;">🎉 勝ちました！🎉</strong>
+      `;
+      document.getElementById("result").innerHTML = resultText;
+      document.getElementById("coupon").innerText = "🎁 クーポンコード：ABC123 🎁";
+
+      document.querySelectorAll('.hands img').forEach(img => {
+        img.classList.add('disabled');
+      });
+    }
+  </script>
 </body>
 </html>
