@@ -21,29 +21,29 @@
   <div id="result"></div>
   <div id="coupon"></div>
 
-  <script>
-    const hands = ["ぐー", "ちょき", "ぱー"];
-    const winMap = {
-      "ぐー": "ちょき",
-      "ちょき": "ぱー",
-      "ぱー": "ぐー"
-    };
+<script>
+  const hands = ["ぐー", "ちょき", "ぱー"];
+  const winMap = {
+    "ぐー": "ちょき",
+    "ちょき": "ぱー",
+    "ぱー": "ぐー"
+  };
 
-    function play(user) {
-      const computer = hands[Math.floor(Math.random() * hands.length)];
-      let resultText = `あなた：${user} ／ 相手：${computer}<br>`;
-      if (user === computer) {
-        resultText += "あいこです。もう一度！";
-        document.getElementById("coupon").innerText = "";
-      } else if (winMap[user] === computer) {
-        resultText += "あなたの勝ち！";
-        document.getElementById("coupon").innerText = "🎉 クーポンコード：ABC123 🎉";
-      } else {
-        resultText += "あなたの負け…もう一度挑戦！";
-        document.getElementById("coupon").innerText = "";
-      }
-      document.getElementById("result").innerHTML = resultText;
+  function play(user) {
+    // ユーザーと違う手を選ぶようにフィルター
+    const filteredHands = hands.filter(hand => hand !== user);
+    const computer = filteredHands[Math.floor(Math.random() * filteredHands.length)];
+
+    let resultText = `あなた：${user} ／ 相手：${computer}<br>`;
+    if (winMap[user] === computer) {
+      resultText += "あなたの勝ち！";
+      document.getElementById("coupon").innerText = "🎉 クーポンコード：ABC123 🎉";
+    } else {
+      resultText += "あなたの負け…もう一度挑戦！";
+      document.getElementById("coupon").innerText = "";
     }
-  </script>
+    document.getElementById("result").innerHTML = resultText;
+  }
+</script>
 </body>
 </html>
