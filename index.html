@@ -44,7 +44,7 @@
       user-select: none;
     }
 
-    button:hover {
+    button:hover:not(:disabled) {
       transform: scale(1.1);
       box-shadow: 0 0 10px #ff4081;
     }
@@ -57,7 +57,7 @@
       opacity: 0.6;
     }
 
-    #result, #coupon {
+    #result, #couponContainer {
       margin-top: 1.5rem;
       font-size: 1.3rem;
       opacity: 0;
@@ -77,6 +77,13 @@
       }
     }
 
+    #couponContainer {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 1rem;
+    }
+
     #coupon {
       font-size: 2.5rem;
       color: #00ff99;
@@ -86,8 +93,30 @@
         0 0 10px #00ff99,
         0 0 20px #00ff99,
         0 0 40px #00ff99;
-      animation: glow 1.5s ease-in-out infinite alternate;
       user-select: text;
+      animation: glow 1.5s ease-in-out infinite alternate;
+    }
+
+    #copyButton {
+      font-size: 1.2rem;
+      padding: 0.5rem 1rem;
+      background: #00cc66;
+      color: #fff;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      transition: background-color 0.3s;
+      user-select: none;
+    }
+
+    #copyButton:hover {
+      background: #00ff88;
+    }
+
+    #copyButton:disabled {
+      background: #555;
+      cursor: default;
+      opacity: 0.6;
     }
 
     @keyframes glow {
@@ -140,7 +169,10 @@
     <button id="btnPa" onclick="play('ぱー')">🖐️ ぱー</button>
   </div>
   <div id="result"></div>
-  <div id="coupon"></div>
+  <div id="couponContainer" style="opacity:0; transform: translateY(30px);">
+    <div id="coupon"></div>
+    <button id="copyButton" onclick="copyCoupon()" title="クーポンコードをコピー">コピー</button>
+  </div>
   <canvas class="confetti" id="confettiCanvas"></canvas>
 
   <script>
@@ -151,6 +183,7 @@
     };
 
     let played = false;
+    let currentCoupon = "ABC123";
 
     function play(user) {
       if (played) return;
@@ -166,10 +199,13 @@
       document.getElementById("result").innerHTML = resultText;
       document.getElementById("result").classList.add("show");
 
-      const couponText = "🎁 クーポンコード：ABC123 🎁";
       const couponElem = document.getElementById("coupon");
-      couponElem.innerText = couponText;
-      couponElem.classList.add("show");
+      couponElem.innerText = `🎁 クーポンコード：${currentCoupon} 🎁`;
+
+      const couponContainer = document.getElementById("couponContainer");
+      couponContainer.style.opacity = "1";
+      couponContainer.style.transform = "translateY(0)";
+      couponContainer.classList.add("show");
 
       // ボタン無効化
       document.querySelectorAll('.hands button').forEach(btn => {
@@ -177,6 +213,15 @@
       });
 
       launchConfetti();
+    }
+
+    function copyCoupon() {
+      const couponText = currentCoupon;
+      navigator.clipboard.writeText(couponText).then(() => {
+        alert("クーポンコードをコピーしました！: " + couponText);
+      }).catch(() => {
+        alert("コピーに失敗しました。手動でコピーしてください。");
+      });
     }
 
     // Confetti effect
