@@ -2,92 +2,91 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>じゃんけんクーポン</title>
   <style>
-    html, body {
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
       margin: 0;
-      padding: 0;
-      height: 100%;
-      font-family: "Segoe UI", "Helvetica Neue", sans-serif;
-      background: linear-gradient(to right, #1f1c2c, #928dab);
-      color: #fff;
+      background: linear-gradient(135deg, #222, #444);
+      color: white;
       text-align: center;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-    }
-
-    .container {
-      padding: 2vh 4vw;
-      max-width: 600px;
-      margin: auto;
-      display: flex;
-      flex-direction: column;
-      gap: 2vh;
-      justify-content: center;
     }
 
     h1 {
-      font-size: clamp(1.2rem, 2.5vw, 2rem);
-      margin: 0.5em 0;
-      text-shadow: 1px 1px #000;
+      font-size: 2rem;
+      margin-bottom: 1rem;
     }
 
     .hands {
       display: flex;
+      gap: 1rem;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
       justify-content: center;
-      gap: 5vw;
-      flex-wrap: nowrap;
     }
 
-    .hands img {
-      width: clamp(60px, 20vw, 100px);
+    button {
+      font-size: 1.5rem;
+      padding: 0.8rem 1.5rem;
+      border-radius: 8px;
+      border: none;
+      background: #ff4081;
+      color: white;
       cursor: pointer;
-      transition: transform 0.3s, filter 0.3s;
+      transition: transform 0.3s, box-shadow 0.3s;
     }
 
-    .hands img:hover {
+    button:hover {
       transform: scale(1.1);
-      filter: drop-shadow(0 0 5px #fff);
+      box-shadow: 0 0 10px #ff4081;
     }
 
-    .hands img.disabled {
-      opacity: 0.3;
-      cursor: default;
+    #result, #coupon {
+      margin-top: 1.5rem;
+      font-size: 1.3rem;
+      opacity: 0;
+      transform: translateY(30px);
+      animation: none;
+    }
+
+    .show {
+      animation: fadeInUp 1s ease forwards;
+    }
+
+    @keyframes fadeInUp {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .confetti {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
       pointer-events: none;
-    }
-
-    #result {
-      font-size: clamp(0.9rem, 1.5vw, 1.2rem);
-      line-height: 1.5;
-      margin-top: 1em;
-    }
-
-    #coupon {
-      font-size: clamp(1rem, 2vw, 1.5rem);
-      color: #00ff99;
-      font-weight: bold;
-      animation: glow 1s infinite alternate;
-    }
-
-    @keyframes glow {
-      from { text-shadow: 0 0 3px #0f0, 0 0 6px #0f0; }
-      to { text-shadow: 0 0 10px #0f0, 0 0 15px #0f0; }
+      z-index: 999;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>🔥 じゃんけんでクーポンゲット！ 🔥</h1>
-    <div class="hands">
-      <img src="gu.png" alt="ぐー" onclick="play('ぐー')">
-      <img src="choki.png" alt="ちょき" onclick="play('ちょき')">
-      <img src="pa.png" alt="ぱー" onclick="play('ぱー')">
-    </div>
-    <div id="result"></div>
-    <div id="coupon"></div>
+  <h1>じゃんけんでクーポンゲット！</h1>
+  <div class="hands">
+    <button onclick="play('ぐー')">✊ ぐー</button>
+    <button onclick="play('ちょき')">✌️ ちょき</button>
+    <button onclick="play('ぱー')">🖐️ ぱー</button>
   </div>
+  <div id="result"></div>
+  <div id="coupon"></div>
+  <canvas class="confetti" id="confettiCanvas"></canvas>
 
   <script>
     const winMap = {
@@ -95,27 +94,79 @@
       "ちょき": "ぱー",
       "ぱー": "ぐー"
     };
-
-    let hasPlayed = false;
+    let played = false;
 
     function play(user) {
-      if (hasPlayed) return;
-      hasPlayed = true;
+      if (played) return;
+      played = true;
 
       const computer = winMap[user];
-
       const resultText = `
-        🧍‍♂️ <strong>あなた：</strong>${user}<br>
-        🤖 <strong>相手：</strong>${computer}<br><br>
-        <strong style="color: #00ff99;">🎉 勝ちました！🎉</strong>
+        <strong>あなたの手：</strong> ${user}<br>
+        <strong>相手の手：</strong> ${computer}<br><br>
+        🎉 <span style="font-size:1.5rem;">あなたの勝ち！</span> 🎉
       `;
-      document.getElementById("result").innerHTML = resultText;
-      document.getElementById("coupon").innerText = "🎁 クーポンコード：ABC123 🎁";
 
-      document.querySelectorAll('.hands img').forEach(img => {
-        img.classList.add('disabled');
-      });
+      document.getElementById("result").innerHTML = resultText;
+      document.getElementById("result").classList.add("show");
+
+      document.getElementById("coupon").innerText = "🎁 クーポンコード：ABC123 🎁";
+      document.getElementById("coupon").classList.add("show");
+
+      launchConfetti();
     }
+
+    // Confetti effect
+    function launchConfetti() {
+      const canvas = document.getElementById('confettiCanvas');
+      const ctx = canvas.getContext('2d');
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+
+      let particles = [];
+
+      for (let i = 0; i < 200; i++) {
+        particles.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height - canvas.height,
+          r: Math.random() * 6 + 4,
+          d: Math.random() * 30 + 10,
+          color: `hsl(${Math.random() * 360}, 100%, 60%)`,
+          tilt: Math.random() * 10 - 10
+        });
+      }
+
+      function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        particles.forEach(p => {
+          ctx.beginPath();
+          ctx.fillStyle = p.color;
+          ctx.ellipse(p.x, p.y, p.r, p.r * 0.6, p.tilt, 0, 2 * Math.PI);
+          ctx.fill();
+        });
+        update();
+        requestAnimationFrame(draw);
+      }
+
+      function update() {
+        particles.forEach(p => {
+          p.y += 2 + Math.random() * 2;
+          p.x += Math.sin(p.d);
+          if (p.y > canvas.height) {
+            p.y = -10;
+            p.x = Math.random() * canvas.width;
+          }
+        });
+      }
+
+      draw();
+    }
+
+    window.addEventListener('resize', () => {
+      const canvas = document.getElementById('confettiCanvas');
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    });
   </script>
 </body>
 </html>
