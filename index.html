@@ -16,6 +16,7 @@
       background: linear-gradient(135deg, #222, #444);
       color: white;
       text-align: center;
+      padding: 1rem;
     }
 
     h1 {
@@ -40,11 +41,20 @@
       color: white;
       cursor: pointer;
       transition: transform 0.3s, box-shadow 0.3s;
+      user-select: none;
     }
 
     button:hover {
       transform: scale(1.1);
       box-shadow: 0 0 10px #ff4081;
+    }
+
+    button:disabled {
+      background: #555;
+      cursor: default;
+      transform: none;
+      box-shadow: none;
+      opacity: 0.6;
     }
 
     #result, #coupon {
@@ -53,6 +63,7 @@
       opacity: 0;
       transform: translateY(30px);
       animation: none;
+      user-select: none;
     }
 
     .show {
@@ -66,23 +77,67 @@
       }
     }
 
+    #coupon {
+      font-size: 2.5rem;
+      color: #00ff99;
+      font-weight: 900;
+      text-shadow:
+        0 0 5px #00ff99,
+        0 0 10px #00ff99,
+        0 0 20px #00ff99,
+        0 0 40px #00ff99;
+      animation: glow 1.5s ease-in-out infinite alternate;
+      user-select: text;
+    }
+
+    @keyframes glow {
+      from {
+        text-shadow:
+          0 0 5px #00ff99,
+          0 0 10px #00ff99,
+          0 0 20px #00ff99,
+          0 0 40px #00ff99;
+      }
+      to {
+        text-shadow:
+          0 0 10px #00ff99,
+          0 0 20px #00ff99,
+          0 0 30px #00ff99,
+          0 0 60px #00ff99;
+      }
+    }
+
+    /* Confetti canvas */
     .confetti {
       position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
       pointer-events: none;
-      z-index: 999;
+      z-index: 9999;
+    }
+
+    @media (max-width: 480px) {
+      h1 {
+        font-size: 1.5rem;
+      }
+
+      button {
+        font-size: 1.2rem;
+        padding: 0.6rem 1rem;
+      }
+
+      #coupon {
+        font-size: 2rem;
+      }
     }
   </style>
 </head>
 <body>
   <h1>じゃんけんでクーポンゲット！</h1>
   <div class="hands">
-    <button onclick="play('ぐー')">✊ ぐー</button>
-    <button onclick="play('ちょき')">✌️ ちょき</button>
-    <button onclick="play('ぱー')">🖐️ ぱー</button>
+    <button id="btnGu" onclick="play('ぐー')">✊ ぐー</button>
+    <button id="btnChoki" onclick="play('ちょき')">✌️ ちょき</button>
+    <button id="btnPa" onclick="play('ぱー')">🖐️ ぱー</button>
   </div>
   <div id="result"></div>
   <div id="coupon"></div>
@@ -94,6 +149,7 @@
       "ちょき": "ぱー",
       "ぱー": "ぐー"
     };
+
     let played = false;
 
     function play(user) {
@@ -110,8 +166,15 @@
       document.getElementById("result").innerHTML = resultText;
       document.getElementById("result").classList.add("show");
 
-      document.getElementById("coupon").innerText = "🎁 クーポンコード：ABC123 🎁";
-      document.getElementById("coupon").classList.add("show");
+      const couponText = "🎁 クーポンコード：ABC123 🎁";
+      const couponElem = document.getElementById("coupon");
+      couponElem.innerText = couponText;
+      couponElem.classList.add("show");
+
+      // ボタン無効化
+      document.querySelectorAll('.hands button').forEach(btn => {
+        btn.disabled = true;
+      });
 
       launchConfetti();
     }
