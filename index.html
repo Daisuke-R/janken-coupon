@@ -36,8 +36,10 @@
 
     const computer = winMap[user];
 
-    let resultText = `あなた：${user} ／ 相手：${computer}<br>`;
-    resultText += "あなたの勝ち！";
+    let resultText = `
+   🧍‍♂️ <strong>あなたの手：</strong>${user}<br>
+   🤖 <strong>相手の手：</strong>${computer}<br><br>
+   🎉 <strong style="color: green;">勝ちました！おめでとう！</strong> 🎉`;
     document.getElementById("result").innerHTML = resultText;
     document.getElementById("coupon").innerText = "🎉 クーポンコード：ABC123 🎉";
   }
